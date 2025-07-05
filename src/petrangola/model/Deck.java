@@ -12,6 +12,12 @@ public class Deck {
 
     public Deck() {
         this.allCards = new ArrayList<Card>();
+        setUp();
+
+    }
+    
+    private void setUp() {
+        
         
         for (int i = 0; i < Rank.values().length; i++) {
             for (int j = 0; j < Seed.values().length; j++) {
@@ -21,7 +27,6 @@ public class Deck {
 
         currentCards = Utils.copy(allCards);
         Utils.shuffle(currentCards);
-
     }
 
     public Hand drawHand() {
@@ -30,8 +35,12 @@ public class Deck {
             cards.add(currentCards.remove(i));
         }
         
-        Hand hand = new Hand();
-        hand.setCards(cards);
+        Hand hand = new Hand(cards);
         return hand;
+    }
+
+    @Override
+    public String toString() {
+        return "Cards Remaining: " + currentCards.size() + "\n" + currentCards.toString();
     }
 }

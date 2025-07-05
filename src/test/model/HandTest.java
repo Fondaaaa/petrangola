@@ -19,23 +19,19 @@ public class HandTest {
     Deck deck;
 
    
-    @BeforeEach
-    void setUp() {
-        deck = new Deck();
-    }
+    
 
     @Test
     public void swap() {
         Hand hand = Hand.of(new Card(Seed.BASTONI,Rank.TRE), new Card(Seed.SPADE, Rank.RE), new Card(Seed.DENARI, Rank.ASSO));
         Hand field = Hand.of(new Card(Seed.COPPE,Rank.DUE), new Card(Seed.SPADE, Rank.QUATTRO), new Card(Seed.COPPE, Rank.FANTE));
         
-        var newHand = List.copyOf(hand.getCards());
-        var newField = List.copyOf(field.getCards());
-
-        hand.swap(field, List.of(0,1), List.of(1,2));
+        Card temp = hand.get(2);
+        hand.set(field.get(0),2);
+        field.set(temp,0);
         
-        assertEquals(List.of(newField.get(1),newField.get(2),newHand.get(2)), hand.getCards());
-        assertEquals(List.of(newField.get(0),newHand.get(0),newHand.get(1)),field.getCards());
+        assertEquals(Hand.of(new Card(Seed.BASTONI,Rank.TRE), new Card(Seed.SPADE, Rank.RE),new Card(Seed.COPPE,Rank.DUE)), hand);
+        assertEquals(Hand.of(new Card(Seed.DENARI, Rank.ASSO),new Card(Seed.SPADE, Rank.QUATTRO), new Card(Seed.COPPE, Rank.FANTE)),field);
         
         
         

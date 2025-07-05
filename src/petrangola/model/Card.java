@@ -1,4 +1,8 @@
 package petrangola.model;
+import java.net.URL;
+import java.util.Objects;
+
+import javafx.scene.image.Image;
 
 public class Card implements Comparable<Card>{
 
@@ -43,6 +47,28 @@ public class Card implements Comparable<Card>{
     public int points() {
         return rank.getPoints();
     }
+
+    public URL getImageURL() {
+        String path = "/resources/images/" + seed.toString() + (rank.ordinal() + 1) + ".png";
+        return getClass().getResource(path.toLowerCase());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Card)) {
+            return false;
+        }
+        Card card = (Card) o;
+        return Objects.equals(rank, card.rank) && Objects.equals(seed, card.seed);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rank, seed);
+    }
+    
 
     
 }

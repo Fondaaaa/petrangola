@@ -1,5 +1,7 @@
 package petrangola.model;
 public enum Rank {
+    
+    ASSO(11),
     DUE(2),
     TRE(3),
     QUATTRO(4),
@@ -8,8 +10,8 @@ public enum Rank {
     SETTE(7),
     FANTE(10),
     CAVALLO(10),
-    RE(10),
-    ASSO(11);
+    RE(10);
+    
 
     private final int value;
 

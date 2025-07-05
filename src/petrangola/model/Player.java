@@ -9,16 +9,11 @@ public class Player {
     private int hp;
 
     public Player() {
-        this.hand = new Hand();
         this.hp = STARTING_HP;
     }
 
     public void setHand(Hand hand) {
         this.hand = hand;
-    }
-
-    public void swap(Hand field, List<Integer> handPos, List<Integer> fieldPos) {
-        this.hand.swap(field, handPos, fieldPos);
     }
 
     public Hand getHand() {
@@ -34,6 +29,11 @@ public class Player {
         hp--;
         return hp;
     }
+
+    @Override
+   public String toString() {
+      return "You";
+   }
 
     
 
