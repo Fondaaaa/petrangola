@@ -28,264 +28,284 @@ import java.awt.Dimension;
 import java.awt.Toolkit;;
 
 public class MainPane extends BorderPane {
-    private GameController controller;
-    private GridPane centerGrid;
-    private GridPane lowerButtons;
-    private List<CardButton> fieldButtons;
-    private List<CardButton> handButtons;
-    private TextArea log;
-    private Button swapButton;
-    private Button endTurnButton;
-    private Button knockButton;
-    private Button newGameButton;
-    private Hand initialHand;
+	private GameController controller;
+	private GridPane centerGrid;
+	private GridPane lowerButtons;
+	private List<CardButton> fieldButtons;
+	private List<CardButton> handButtons;
+	private TextArea log;
+	private Button swapButton;
+	private Button endTurnButton;
+	private Button knockButton;
+	private Hand initialHand;
 
-    public MainPane(GameController controller) {
-        this.controller = controller;
-        
-        initPane();
-        newGame();
-    }
+	public MainPane(GameController controller) {
+		this.controller = controller;
 
-    public void initPane() {
-        initCentralGrid();
-        initLowerBox();
+		initPane();
+		newGame();
+	}
 
-        setTop(log);
-        centerGrid.setMinSize(0, 0);
-        setCenter(centerGrid);
-        
-        // Use preferred height as minimum for top and bottom
+	public void initPane() {
+		initCentralGrid();
+		initLowerBox();
 
-        if (controller.getCurrentPlayer() instanceof Bot)
-            handleBotTurns();
+		setTop(log);
+		centerGrid.setMinSize(0, 0);
+		setCenter(centerGrid);
 
-    }
+		// Use preferred height as minimum for top and bottom
 
-    public void initCentralGrid() {
-        centerGrid = new GridPane(2, 3);
-        {
+		if (controller.getCurrentPlayer() instanceof Bot)
+			handleBotTurns();
 
-            log = new TextArea("Partita iniziata!\nNumero giocatori: " + controller.players().size() +
-                "\n" + controller.players() + "\n");
+	}
 
-            this.fieldButtons = new ArrayList<CardButton>();
-            this.handButtons = new ArrayList<CardButton>();
+	public void initCentralGrid() {
+		centerGrid = new GridPane(2, 3);
+		{
 
-            for (int i = 0; i < Hand.HAND_SIZE; i++) {
-                // FIELD
-                
-                CardButton cardButton = new CardButton("field" + (i + 1));
-                fieldButtons.add(cardButton);
-                ImageView imgView = cardButton.getImageView();
-                centerGrid.add(imgView, i, 0);
-                centerGrid.add(cardButton, i, 1);
+			log = new TextArea("Partita iniziata!\nNumero giocatori: " + controller.players().size() + "\n"
+					+ controller.players() + "\n");
 
-                // HAND
-                cardButton = new CardButton("hand" + (i + 1));
-                handButtons.add(cardButton);
-                centerGrid.add(cardButton.getImageView(), i, 2);
-                centerGrid.add(cardButton, i, 3);
+			this.fieldButtons = new ArrayList<CardButton>();
+			this.handButtons = new ArrayList<CardButton>();
 
-            }
-            centerGrid.setAlignment(Pos.CENTER);
+			for (int i = 0; i < Hand.HAND_SIZE; i++) {
+				// FIELD
 
-        }
-    }
+				CardButton cardButton = new CardButton("field" + (i + 1));
+				fieldButtons.add(cardButton);
+				ImageView imgView = cardButton.getImageView();
+				centerGrid.add(imgView, i, 0);
+				centerGrid.add(cardButton, i, 1);
 
-    public void initLowerBox() {
-        lowerButtons = new GridPane(0, 2);
-        {
-            swapButton = new Button("Scambia");
-            swapButton.setOnAction(this::handleMove);
+				// HAND
+				cardButton = new CardButton("hand" + (i + 1));
+				handButtons.add(cardButton);
+				centerGrid.add(cardButton.getImageView(), i, 2);
+				centerGrid.add(cardButton, i, 3);
 
-            endTurnButton = new Button("Conferma");
-            endTurnButton.setOnAction(this::handleEndTurn);
-            knockButton = new Button("Bussa!");
-            knockButton.setOnAction(this::handleKnock);
+			}
+			centerGrid.setAlignment(Pos.CENTER);
 
-            newGameButton = new Button("Rigioca");
-            newGameButton.setOnAction(this::handleNewGame);
-            lowerButtons.addRow(0, swapButton, endTurnButton, knockButton);
-            lowerButtons.setAlignment(Pos.CENTER);
-        }
+		}
+	}
 
-        setBottom(lowerButtons);
-    }
+	public void initLowerBox() {
+		lowerButtons = new GridPane(0, 2);
+		{
+			swapButton = new Button("Scambia");
+			swapButton.setOnAction(this::handleMove);
 
-    public void newGame() {
-        controller.newRound();
-        
-        log.appendText("inizia\n" + controller.getCurrentPlayer());
+			endTurnButton = new Button("Conferma");
+			endTurnButton.setOnAction(this::handleEndTurn);
+			knockButton = new Button("Bussa!");
+			knockButton.setOnAction(this::handleKnock);
 
-        initialHand = new Hand(controller.getHand().getCards().stream().collect(Collectors.toList()));
+			lowerButtons.addRow(0, swapButton, endTurnButton, knockButton);
+			lowerButtons.setAlignment(Pos.CENTER);
+		}
 
-        for(int i=0; i<Hand.HAND_SIZE;i++) {
-            Card card = controller.getField().get(i);
-            fieldButtons.get(i).setCard(card);
+		setBottom(lowerButtons);
+	}
 
-            card=controller.getHand().get(i);
-            handButtons.get(i).setCard(card);
-        }
-    }
+	public void newGame() {
+		controller.newRound();
 
-    public void handleMove(ActionEvent event) {
-        List<Integer> selectedMano = new ArrayList<>();
-        List<Integer> selectedCampo = new ArrayList<>();
+		log.appendText("inizia " + controller.getCurrentPlayer() + "\n");
 
-        for (int i = 0; i < 3; i++) {
-            if (handButtons.get(i).isSelected()) {
-                selectedMano.add(i);
-            }
-            if (fieldButtons.get(i).isSelected()) {
-                selectedCampo.add(i);
-            }
-        }
+		initialHand = new Hand(controller.getHand().getCards().stream().collect(Collectors.toList()));
 
-        if (selectedMano.size() != selectedCampo.size()) {
-            showWarning("Devi selezionare lo stesso numero di carte da mano e da campo!");
-            return;
-        }
+		for (int i = 0; i < Hand.HAND_SIZE; i++) {
+			Card card = controller.getField().get(i);
+			fieldButtons.get(i).setCard(card);
 
-        if (selectedMano.size() == 0) {
-            showWarning("Seleziona almeno una carta!");
-        }
+			card = controller.getHand().get(i);
+			handButtons.get(i).setCard(card);
+		}
+	}
 
-        log.appendText("Hai scambiato:");
+	public void handleMove(ActionEvent event) {
+		List<Integer> selectedMano = new ArrayList<>();
+		List<Integer> selectedCampo = new ArrayList<>();
 
-        // Scambia le carte
-        for (int j = 0; j < selectedMano.size(); j++) {
-            int iMano = selectedMano.get(j);
-            int iCampo = selectedCampo.get(j);
+		for (int i = 0; i < 3; i++) {
+			if (handButtons.get(i).isSelected()) {
+				selectedMano.add(i);
+			}
+			if (fieldButtons.get(i).isSelected()) {
+				selectedCampo.add(i);
+			}
+		}
 
-            Card newField = controller.getHand().get(iMano);
-            Card newHand = controller.getField().get(iCampo);
+		if (selectedMano.size() != selectedCampo.size()) {
+			showWarning("Devi selezionare lo stesso numero di carte da mano e da campo!");
+			return;
+		}
 
-            log.appendText("\n" + newField + "con" + newHand);
-            // controller.getHand().set(newHand, iMano);
-            // handButtons.get(iMano).setCard(newHand);
-            // controller.getField().set(newField, iCampo);
-            // fieldButtons.get(iCampo).setCard(newField);
+		if (selectedMano.size() == 0) {
+			showWarning("Seleziona almeno una carta!");
+		}
 
-            controller.swap(iMano, iCampo);
-            handButtons.get(iMano).setCard(newHand);
-            fieldButtons.get(iCampo).setCard(newField);
+		log.appendText("Hai scambiato:" + "\n");
 
-        }
+		// Scambia le carte
+		for (int j = 0; j < selectedMano.size(); j++) {
+			int iMano = selectedMano.get(j);
+			int iCampo = selectedCampo.get(j);
 
-        // Opzionale: reset selezioni
-        handButtons.forEach(btn -> btn.setSelected(false));
-        fieldButtons.forEach(btn -> btn.setSelected(false));
+			Card newField = controller.getHand().get(iMano);
+			Card newHand = controller.getField().get(iCampo);
 
-    }
+			log.appendText(newField + "con" + newHand + "\n");
+			// controller.getHand().set(newHand, iMano);
+			// handButtons.get(iMano).setCard(newHand);
+			// controller.getField().set(newField, iCampo);
+			// fieldButtons.get(iCampo).setCard(newField);
 
-    public void handleEndTurn(ActionEvent event) {
-        if (controller.getHand().equals(initialHand)) {
-            showWarning("Non hai scambiato carte!");
-            return;
-        }
-        controller.updateRemainingTurns();
-        controller.nextPlayer();
-        handleBotTurns();
+			controller.swap(iMano, iCampo);
+			handButtons.get(iMano).setCard(newHand);
+			fieldButtons.get(iCampo).setCard(newField);
 
-    }
+		}
 
-    public void handleKnock(ActionEvent event) {
-        log.appendText("Hai bussato!");
-        controller.knock();
-        log.appendText("\nTurni rimanenti: " + controller.getRemainingTurns().get() + "\n");
-        handleBotTurns();
-    }
+		// Opzionale: reset selezioni
+		handButtons.forEach(btn -> btn.setSelected(false));
+		fieldButtons.forEach(btn -> btn.setSelected(false));
 
-    public void handleNewGame(ActionEvent event) {
-        newGame();
-        initLowerBox();
-        handleBotTurns();
-    }
+	}
 
-    public void setDisableButtons(boolean bool) {
-        knockButton.setDisable(bool);
-        endTurnButton.setDisable(bool);
-        swapButton.setDisable(bool);
-    }
+	public void handleEndTurn(ActionEvent event) {
+		if (controller.getHand().equals(initialHand)) {
+			showWarning("Non hai scambiato carte!");
+			return;
+		}
+		controller.updateRemainingTurns();
+		controller.nextPlayer();
+		handleBotTurns();
 
-    public void showWarning(String errorText) {
-        Alert alert = new Alert(AlertType.WARNING);
-        alert.setContentText(errorText);
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            alert.close();
-        }
+	}
 
-    }
+	public void handleKnock(ActionEvent event) {
+		log.appendText("Hai bussato!\n");
+		controller.knock();
+		log.appendText("Turni rimanenti: " + controller.getRemainingTurns().get() + "\n");
+		handleBotTurns();
+	}
 
-    private void handleBotTurns() {
-        // Stop if partita è finita
-        if (controller.getRemainingTurns().orElse(1) == 0) {
-            log.appendText("\nLa partita è finita!\n");
-            handlePostGame();
-            return;
-        }
+	public void handleNewGame(ActionEvent event) {
+		newGame();
+		initLowerBox();
+		handleBotTurns();
+	}
 
-        Player currentPlayer = controller.getCurrentPlayer();
+	public void setDisableButtons(boolean bool) {
+		knockButton.setDisable(bool);
+		endTurnButton.setDisable(bool);
+		swapButton.setDisable(bool);
+	}
 
-        // Se non è un bot, aspetta l'interazione del giocatore
-        if (!(currentPlayer instanceof Bot)) {
-            setDisableButtons(false);
-            return;
+	public void showWarning(String errorText) {
+		Alert alert = new Alert(AlertType.WARNING);
+		alert.setContentText(errorText);
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.isPresent() && result.get() == ButtonType.OK) {
+			alert.close();
+		}
 
-        }
-        setDisableButtons(true);
+	}
 
-        PauseTransition pause = new PauseTransition(Duration.seconds(1));
-        pause.setOnFinished(e -> {
-            Player bot = currentPlayer;
-            List<Card> swaps = controller.botTakeTurn();
+	private void handleBotTurns() {
+		// Stop if partita è finita
+		if (controller.getRemainingTurns().orElse(1) == 0) {
+			handlePostGame();
+			return;
+		}
 
-            if (swaps.isEmpty()) {
+		Player currentPlayer = controller.getCurrentPlayer();
 
-                log.appendText("\n" + bot + " ha bussato!\n");
-            } else {
-                for (int i = 0; i < swaps.size(); i += 2) {
-                    log.appendText("\n" + bot + " ha scambiato " + swaps.get(i) + " con " + swaps.get(i + 1));
-                }
-            }
+		// Se non è un bot, aspetta l'interazione del giocatore
+		if (!(currentPlayer instanceof Bot)) {
+			setDisableButtons(false);
+			return;
 
-            if (controller.getRemainingTurns().isPresent()) {
-                log.appendText("Turni Rimanenti:" + controller.getRemainingTurns().get());
-            }
+		}
+		setDisableButtons(true);
 
-            // Aggiorna UI delle carte (opzionale se hai modificato carte)
-            updateCardButtons();
+		PauseTransition pause = new PauseTransition(Duration.seconds(1));
+		pause.setOnFinished(e -> {
+			Player bot = currentPlayer;
+			List<Card> swaps = controller.botTakeTurn();
 
-            // Prossimo turno bot
-            handleBotTurns();
-        });
+			if (swaps.isEmpty()) {
 
-        pause.play();
-    }
+				log.appendText(bot + " ha bussato!\n");
+			} else {
+				for (int i = 0; i < swaps.size(); i += 2) {
+					log.appendText(bot + " ha scambiato " + swaps.get(i) + " con " + swaps.get(i + 1) + "\n");
+				}
+			}
 
-    public void updateCardButtons() {
-        for (int i = 0; i < Hand.HAND_SIZE; i++) {
-            Card card = controller.getField().get(i);
-            fieldButtons.get(i).setCard(card);
-        }
-    }
+			if (controller.getRemainingTurns().isPresent()) {
+				log.appendText("Turni Rimanenti:" + controller.getRemainingTurns().get() + "\n");
+			}
 
-    public void handlePostGame() {
+			// Aggiorna UI delle carte (opzionale se hai modificato carte)
+			updateCardButtons();
 
-        Map<Player, Integer> pointsMap = controller.points();
-        for (Player player : controller.players()) {
-            int points = pointsMap.get(player);
-            log.appendText("\n" + player + " ha fatto " + points + " punti\nmano: " + player.getHand());
-        }
+			// Prossimo turno bot
+			handleBotTurns();
+		});
 
-       lowerButtons = new GridPane(0,0);
-       lowerButtons.add(newGameButton,0,0);
-       lowerButtons.setAlignment(Pos.CENTER);
-       setBottom(lowerButtons);
-       
+		pause.play();
+	}
 
-    }
+	public void handlePostGame() {
+		List<Player> players = controller.players();
+		log.appendText("\nPunti:");
+		for (Player player : players) {
+			log.appendText(player + ": " + player.getHand().calcPoints()+ "\nmano : " + player.getHand() + "\n");
+		}
+		log.appendText("\n");
+		handleLives();
+		
+		if(players.size()==1)
+			log.appendText(players.get(0) +" HA VINTO!" +"\n");
+		else {
+			newGame();
+		}
+
+	}
+
+	public void handleLives() {
+		log.appendText("Vite rimanenti: " + "\n");
+		for (Player player : controller.players()) {
+			int hp = player.getHP();
+			if (controller.getLosers().contains(player)) {
+				
+				if (hp > 1) {
+					
+					log.appendText(player + ": " + hp + " -> " + (hp - 1) +"\n");
+					player.loseHealth();
+				} else if (hp == 0) {
+					log.appendText(player + " è stato eliminato\n");
+					controller.players().remove(player);
+				}
+			} else {
+				log.appendText(player + ": "+ hp +" -> " +hp +"\n");
+
+		}
+
+	}
+
+	}
+
+	public void updateCardButtons() {
+		for (int i = 0; i < Hand.HAND_SIZE; i++) {
+			Card card = controller.getField().get(i);
+			fieldButtons.get(i).setCard(card);
+		}
+	}
 
 }

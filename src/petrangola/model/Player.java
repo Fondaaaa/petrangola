@@ -1,6 +1,5 @@
 package petrangola.model;
 
-import java.util.List;
 
 public class Player {
     
@@ -29,10 +28,14 @@ public class Player {
         hp--;
         return hp;
     }
+    
+    public int getHP() {
+    	return hp;
+    }
 
     @Override
    public String toString() {
-      return "You";
+      return "Tu";
    }
 
     

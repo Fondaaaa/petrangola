@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import petrangola.model.Bot;
 import petrangola.model.Card;
@@ -25,6 +26,7 @@ public class GameController {
 
     public void newRound() {
         game.initRound();
+        remainingTurns = Optional.empty();
     }
 
     public List<Player> players() {
@@ -107,6 +109,15 @@ public class GameController {
         }
 
         return pointsMap;
+    }
+    
+    public List<Player> getLosers() {
+    	List<Player> losers = new ArrayList<Player>();
+    	Map<Player,Integer> pointsMap = points();
+    	int min = pointsMap.values().stream().min(Integer::compareTo).get();
+    	
+    	losers = players().stream().filter(player -> pointsMap.get(player) == min).collect(Collectors.toList());
+    	return losers;
     }
 
 }
