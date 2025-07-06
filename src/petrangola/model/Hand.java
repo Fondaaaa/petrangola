@@ -191,9 +191,7 @@ public class Hand {
 
     @Override
     public String toString() {
-        return "{" +
-                " cards='" + getCards() + "'" +
-                "}";
+        return cards.get(0) + " , " + cards.get(1) + " , " + cards.get(2);
     }
 
 }

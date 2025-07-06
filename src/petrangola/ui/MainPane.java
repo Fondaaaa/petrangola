@@ -14,12 +14,18 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.util.Duration;
 import petrangola.controller.GameController;
 import petrangola.model.*;
+
+import java.awt.Dimension;
+import java.awt.Toolkit;;
 
 public class MainPane extends BorderPane {
     private GameController controller;
@@ -31,13 +37,14 @@ public class MainPane extends BorderPane {
     private Button swapButton;
     private Button endTurnButton;
     private Button knockButton;
+    private Button newGameButton;
     private Hand initialHand;
 
     public MainPane(GameController controller) {
         this.controller = controller;
-        controller.newRound();
+        
         initPane();
-
+        newGame();
     }
 
     public void initPane() {
@@ -45,9 +52,10 @@ public class MainPane extends BorderPane {
         initLowerBox();
 
         setTop(log);
+        centerGrid.setMinSize(0, 0);
         setCenter(centerGrid);
-        setBottom(lowerButtons);
-        setPadding(new Insets(10, 10, 10, 10));
+        
+        // Use preferred height as minimum for top and bottom
 
         if (controller.getCurrentPlayer() instanceof Bot)
             handleBotTurns();
@@ -57,28 +65,28 @@ public class MainPane extends BorderPane {
     public void initCentralGrid() {
         centerGrid = new GridPane(2, 3);
         {
-            log = new TextArea("Partita iniziata!\nNumero giocatori: " + controller.players().size() +
-                    "\n" + controller.players());
-            log.appendText("inizia" + controller.getCurrentPlayer());
 
-            initialHand = new Hand(controller.getHand().getCards().stream().collect(Collectors.toList()));
+            log = new TextArea("Partita iniziata!\nNumero giocatori: " + controller.players().size() +
+                "\n" + controller.players() + "\n");
 
             this.fieldButtons = new ArrayList<CardButton>();
             this.handButtons = new ArrayList<CardButton>();
 
             for (int i = 0; i < Hand.HAND_SIZE; i++) {
                 // FIELD
-                Card card = controller.getField().get(i);
-                CardButton cardButton = new CardButton("field" + (i + 1), card);
+                
+                CardButton cardButton = new CardButton("field" + (i + 1));
                 fieldButtons.add(cardButton);
-                centerGrid.add(cardButton.getImageView(), i, 0);
+                ImageView imgView = cardButton.getImageView();
+                centerGrid.add(imgView, i, 0);
                 centerGrid.add(cardButton, i, 1);
+
                 // HAND
-                card = controller.getHand().get(i);
-                cardButton = new CardButton("hand" + (i + 1), card);
+                cardButton = new CardButton("hand" + (i + 1));
                 handButtons.add(cardButton);
                 centerGrid.add(cardButton.getImageView(), i, 2);
                 centerGrid.add(cardButton, i, 3);
+
             }
             centerGrid.setAlignment(Pos.CENTER);
 
@@ -96,8 +104,28 @@ public class MainPane extends BorderPane {
             knockButton = new Button("Bussa!");
             knockButton.setOnAction(this::handleKnock);
 
+            newGameButton = new Button("Rigioca");
+            newGameButton.setOnAction(this::handleNewGame);
             lowerButtons.addRow(0, swapButton, endTurnButton, knockButton);
             lowerButtons.setAlignment(Pos.CENTER);
+        }
+
+        setBottom(lowerButtons);
+    }
+
+    public void newGame() {
+        controller.newRound();
+        
+        log.appendText("inizia\n" + controller.getCurrentPlayer());
+
+        initialHand = new Hand(controller.getHand().getCards().stream().collect(Collectors.toList()));
+
+        for(int i=0; i<Hand.HAND_SIZE;i++) {
+            Card card = controller.getField().get(i);
+            fieldButtons.get(i).setCard(card);
+
+            card=controller.getHand().get(i);
+            handButtons.get(i).setCard(card);
         }
     }
 
@@ -169,6 +197,18 @@ public class MainPane extends BorderPane {
         handleBotTurns();
     }
 
+    public void handleNewGame(ActionEvent event) {
+        newGame();
+        initLowerBox();
+        handleBotTurns();
+    }
+
+    public void setDisableButtons(boolean bool) {
+        knockButton.setDisable(bool);
+        endTurnButton.setDisable(bool);
+        swapButton.setDisable(bool);
+    }
+
     public void showWarning(String errorText) {
         Alert alert = new Alert(AlertType.WARNING);
         alert.setContentText(errorText);
@@ -191,8 +231,11 @@ public class MainPane extends BorderPane {
 
         // Se non è un bot, aspetta l'interazione del giocatore
         if (!(currentPlayer instanceof Bot)) {
+            setDisableButtons(false);
             return;
+
         }
+        setDisableButtons(true);
 
         PauseTransition pause = new PauseTransition(Duration.seconds(1));
         pause.setOnFinished(e -> {
@@ -230,11 +273,18 @@ public class MainPane extends BorderPane {
     }
 
     public void handlePostGame() {
+
         Map<Player, Integer> pointsMap = controller.points();
         for (Player player : controller.players()) {
-            int points = controller.points().get(player);
-            log.appendText("\n" + player + " ha fatto " + points + " punti\nmano: " + player.getHand() );
+            int points = pointsMap.get(player);
+            log.appendText("\n" + player + " ha fatto " + points + " punti\nmano: " + player.getHand());
         }
+
+       lowerButtons = new GridPane(0,0);
+       lowerButtons.add(newGameButton,0,0);
+       lowerButtons.setAlignment(Pos.CENTER);
+       setBottom(lowerButtons);
+       
 
     }
 

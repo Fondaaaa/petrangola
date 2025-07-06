@@ -1,12 +1,13 @@
 package petrangola;
 
 import javafx.application.Application;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import petrangola.controller.GameController;
 import petrangola.ui.MainPane;
-
 
 public class PetrangolaApp extends Application {
 
@@ -17,12 +18,27 @@ public class PetrangolaApp extends Application {
 
     @Override
     public void start(Stage stage) {
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds(); // Usable screen area (excluding taskbar, etc.)
+
+        double screenWidth = bounds.getWidth();
+        double screenHeight = bounds.getHeight();
+
         GameController controller = new GameController(3);
 
         BorderPane pane = new MainPane(controller);
+        pane.setMinWidth(0);
+        pane.setMinHeight(0);
         Scene scene = new Scene(pane);
         stage.setScene(scene);
+    
+        stage.setHeight(screenHeight);
+        stage.setWidth(screenWidth/3);
         stage.show();
 
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }
