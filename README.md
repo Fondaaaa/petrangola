@@ -1,18 +1,9 @@
-## Getting Started
+Solo singleplayer contro il computer, multiplayer non ancora implementato.
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+Regole:
 
-## Folder Structure
+3 carte a testa + 3 carte in campo.Ognuno ha 3 vite. A ogni turno si scambiano quante carte si vuole con il campo. Se non si hanno mosse disponibili si bussa. Dopo che qualcuno ha bussato, il gioco terminerà quando si arriva di nuovo a quel giocatore. 
+Si contano i punti: somma di carte dello stesso seme < tris < scala.
 
-The workspace contains two folders by default, where:
+Il giocatore, o giocatori in caso di pareggio, che ha fatto meno punti perde una vita. L'ultimo giocatore che rimane in  vita vince.
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
