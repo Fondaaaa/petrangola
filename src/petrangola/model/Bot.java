@@ -17,7 +17,7 @@ public class Bot extends Player {
       Hand current = super.getHand();
       Hand bestHand = Hand.bestCombinedHand(current, field);
 
-      if (bestHand.equals(current)) {
+      if ( bestHand.calcPoints() <= current.calcPoints()) {
          return swaps; // already optimal, no swap needed
       }
 
@@ -42,6 +42,14 @@ public class Bot extends Player {
       return swaps;
    }
 
+   public boolean knockFirstTurn(int threshold) {
+      boolean knock = false;
+      if (super.getHand().calcPoints() >=threshold)
+         knock = true;
+
+      return knock;
+   }  
+ 
    @Override
    public String toString() {
       return "CPU" + number;

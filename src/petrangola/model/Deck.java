@@ -32,7 +32,7 @@ public class Deck {
     public Hand drawHand() {
         List<Card> cards = new ArrayList<Card>();
         for (int i = 0; i < Hand.HAND_SIZE; i++) {
-            cards.add(currentCards.remove(i));
+            cards.add(currentCards.remove(0));
         }
         
         Hand hand = new Hand(cards);

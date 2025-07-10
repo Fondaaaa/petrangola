@@ -48,10 +48,7 @@ public class Card implements Comparable<Card>{
         return rank.getPoints();
     }
 
-    public URL getImageURL() {
-        String path = "/resources/images/" + seed.toString() + (rank.ordinal() + 1) + ".png";
-        return getClass().getResource(path.toLowerCase());
-    }
+   
 
     @Override
     public boolean equals(Object o) {

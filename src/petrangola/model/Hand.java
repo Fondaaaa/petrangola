@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
 public class Hand {
     public final static int HAND_SIZE = 3;
     private List<Card> cards;
+    private boolean isGulon;
 
     public Hand(List<Card> cards) {
         this.cards = cards;
@@ -22,7 +24,7 @@ public class Hand {
     }
 
     public void setAll(List<Card> cards) {
-        this.cards = cards;
+        this.cards = cards.stream().collect(Collectors.toList());
     }
 
     public void set(Card card, int pos) {
@@ -37,27 +39,29 @@ public class Hand {
         return cards.get(pos);
     }
 
-      public void swap(Hand field, int handPos, int fieldPos) {
+    public void swap(Hand field, int handPos, int fieldPos) {
         Card temp = cards.get(handPos);
-        cards.set(handPos,field.get(fieldPos));
+        cards.set(handPos, field.get(fieldPos));
         field.set(temp, fieldPos);
 
     }
 
-
     public int calcPoints() {
         int total = 0;
         if (isTris()) {
-            total = 32 + cards.get(0).getRank().ordinal();
+            total = 31 + cards.get(0).getRank().ordinal();
             if (cards.get(0).getRank().equals(Rank.ASSO))
                 total += 10;
         }
         if (isScala()) {
             cards.sort(null);
-            if (containsAsso() && cards.get(0).getRank().equals(Rank.DUE))
-                total = 42;
+            if (cards.get(0).isRank(Rank.ASSO) && cards.get(1).isRank(Rank.CAVALLO)) {
+                isGulon = true;
+                total = 52;
+            }
+
             else
-                total = 43 + cards.get(0).getRank().ordinal();
+                total = 42 + cards.get(0).getRank().ordinal();
         } else {
             for (Card c : cards) {
                 if (seedToCount().isPresent()) {
@@ -69,6 +73,11 @@ public class Hand {
         }
 
         return total;
+    }
+
+    public boolean isGulon() {
+        calcPoints();
+        return isGulon;
     }
 
     public Optional<Seed> seedToCount() {
@@ -92,29 +101,13 @@ public class Hand {
             return false;
         sort();
 
-        List<Card> temp = new ArrayList<>(List.copyOf(cards));
-        boolean result = false;
-        if (containsAsso()) {
-
-            if ((temp.get(0).isRank(Rank.ASSO) || temp.get(2).isRank(Rank.ASSO)) &&
-                    temp.get(0).getRank().ordinal() - cards.get(1).getRank().ordinal() == -1)
-                result = true;
-        } else if (cards.get(0).getRank().ordinal() - cards.get(2).getRank().ordinal() == -2) {
-            result = true;
+        boolean result = cards.get(2).getRank().ordinal() - cards.get(0).getRank().ordinal() == 2;
+        if (cards.get(0).isRank(Rank.ASSO) & cards.get(1).isRank(Rank.CAVALLO)) {
+            result = cards.get(2).isRank(Rank.RE);
         }
 
         return result;
 
-    }
-
-    public boolean containsAsso() {
-        boolean containsAsso = false;
-        for (int i = 0; i < HAND_SIZE && !containsAsso; i++) {
-            if (cards.get(i).isRank(Rank.ASSO))
-                containsAsso = true;
-        }
-
-        return containsAsso;
     }
 
     public boolean allSameSeed() {
@@ -176,6 +169,7 @@ public class Hand {
             return false;
         }
         Hand hand = (Hand) o;
+
         return Objects.equals(cards, hand.cards);
     }
 

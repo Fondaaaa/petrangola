@@ -53,11 +53,10 @@ public class HandTest {
 
         assertTrue(scala.isScala());
         assertTrue(scalaAssoInizio.isScala());
-        assertTrue(scalaAssoInizio.containsAsso());
         assertTrue(scalaAssoFine.isScala());
         assertEquals(43,scala.calcPoints());
         assertEquals(42,scalaAssoInizio.calcPoints());
-        assertEquals(50, scalaAssoFine.calcPoints());
+        assertEquals(52, scalaAssoFine.calcPoints());
 
     }
 

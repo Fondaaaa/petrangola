@@ -7,10 +7,17 @@
         
         {
             "type": "java",
+            "name": "mainClass",
+            "request": "launch",
+            "mainClass": "petrangola.mainClass",
+            "projectName": "petrangola"
+        },
+        {
+            "type": "java",
             "name": "javafx",
             "request": "launch",
             "mainClass": "petrangola.PetrangolaApp",
-            "vmArgs": "--module-path C:/Users/Fonda/Documents/JavaProjects/javafx-sdk-21.0.7/lib --add-modules javafx.controls"
+            "vmArgs": "--module-path C:/Users/feder/JavaProjects/useful/javafx/javafx-sdk-21.0.7/lib --add-modules javafx.controls"
         }
     ]
 }

@@ -1,11 +1,12 @@
 package petrangola.ui;
 
+import java.net.URL;
+
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import petrangola.model.Card;
-
 
 public class CardButton extends ToggleButton {
 
@@ -28,10 +29,10 @@ public class CardButton extends ToggleButton {
         });
     }
 
-    
-
     public void setCard(Card card) {
-        imageView.setImage(new Image(card.getImageURL().toExternalForm()));
+        String path = "/resources/images/" + card.getSeed() + (card.getRank().ordinal() + 1) + ".png";
+        URL url = getClass().getResource(path.toLowerCase());
+        imageView.setImage(new Image( url.toExternalForm()));
     }
 
     public ImageView getImageView() {
